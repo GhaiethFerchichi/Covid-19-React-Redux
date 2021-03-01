@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import { connect } from "react-redux";
 
-function App() {
+import { fetchCountries } from "./store/action/countryAction";
+
+import "./App.css";
+import CountryPicker from "./components/CountryPicker/CountryPicker";
+import Spinner from "./UI/Spinner/Spinner";
+import Chart from "./components/Chart/Chart";
+
+function App(props) {
+  useEffect(() => {
+    props.dispatch(fetchCountries());
+  }, []);
+
+  const { loading, error } = props;
+  // console.log("app :", props);
+
+  let content = (
+    <>
+      <CountryPicker />
+      <Chart />
+    </>
+  );
+  if (error) content = <h6>{error.stack}</h6>;
+  if (loading) {
+    console.info("loading");
+    content = <Spinner />;
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <header className="App-header">{content}</header>
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  countries: state.countryState,
+  loading: state.loading,
+  error: state.error,
+});
+
+export default connect(mapStateToProps)(App);
