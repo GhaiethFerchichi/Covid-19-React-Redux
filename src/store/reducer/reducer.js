@@ -1,8 +1,17 @@
 import * as actionTypes from "../action/actionTypes";
 
 const initialState = {
+  summaryState: {
+    summaryData: null,
+    summaryLoading: false,
+    summaryError: null,
+  },
   countryState: {
-    countries: [],
+    countriesState: {
+      countries: [],
+      countriesLoading: true,
+      countriesError: null,
+    },
     countrySelected: {
       countryId: null,
       countryData: null,
@@ -14,21 +23,54 @@ const initialState = {
   error: null,
 };
 
-export default (state = initialState, { type, payload }) => {
+const reducer = (state = initialState, { type, payload }) => {
   switch (type) {
     case actionTypes.GET_COUNTRIES_BEGIN:
-      return { ...state, loading: true, error: null };
+      return {
+        ...state,
+        countryState: {
+          ...state.countryState,
+          countriesState: {
+            ...state.countryState,
+            countries: [],
+            countriesLoading: true,
+            countriesError: null,
+          },
+        },
+
+        loading: true,
+        error: null,
+      };
 
     case actionTypes.GET_COUNTRIES_SUCCESS:
       return {
         ...state,
-        countryState: { ...state.countryState, countries: payload.countries },
+        countryState: {
+          ...state.countryState,
+          countriesState: {
+            ...state.countryState.countriesState,
+            countries: payload.countries,
+            countriesLoading: false,
+          },
+        },
         loading: false,
         error: null,
       };
 
     case actionTypes.GET_COUNTRIES_FAILURE:
-      return { ...state, loading: false, error: payload.error };
+      return {
+        ...state,
+        countryState: {
+          ...state.countryState,
+          countriesState: {
+            ...state.countryState.countriesState,
+            countriesLoading: false,
+            countriesError: payload.error,
+          },
+        },
+        loading: false,
+        error: payload.error,
+      };
 
     case actionTypes.SELECT_COUNTRY:
       return {
@@ -62,6 +104,7 @@ export default (state = initialState, { type, payload }) => {
         loading: false,
         error: null,
       };
+
     case actionTypes.GET_COUNTRY_DATA_FAILURE:
       return {
         ...state,
@@ -78,7 +121,39 @@ export default (state = initialState, { type, payload }) => {
         error: null,
       };
 
+    case actionTypes.GET_SUMMARY_BEGIN:
+      return {
+        ...state,
+        summaryState: {
+          ...state.summaryState,
+          summaryLoading: true,
+          summaryError: null,
+        },
+      };
+
+    case actionTypes.GET_SUMMARY_DATA_SUCCESS:
+      return {
+        ...state,
+        summaryState: {
+          ...state.summaryState,
+          summaryLoading: false,
+          summaryData: payload.summaryData,
+        },
+      };
+
+    case actionTypes.GET_SUMMARY_DATA_FAILURE:
+      return {
+        ...state,
+        summaryState: {
+          ...state.summaryState,
+          summaryLoading: false,
+          summaryError: payload.summaryError,
+        },
+      };
+
     default:
       return state;
   }
 };
+
+export default reducer;

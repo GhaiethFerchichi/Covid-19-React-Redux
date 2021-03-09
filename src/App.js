@@ -1,36 +1,19 @@
-import { useEffect } from "react";
 import { connect } from "react-redux";
 
-import { fetchCountries } from "./store/action/countryAction";
-
+import "carbon-components/css/carbon-components.min.css";
 import "./App.css";
 import CountryPicker from "./components/CountryPicker/CountryPicker";
-import Spinner from "./UI/Spinner/Spinner";
 import Chart from "./components/Chart/Chart";
+import Summary from "./components/Summary/Summary";
 
 function App(props) {
-  useEffect(() => {
-    props.dispatch(fetchCountries());
-  }, []);
-
-  const { loading, error } = props;
-  // console.log("app :", props);
-
-  let content = (
-    <>
-      <CountryPicker />
-      <Chart />
-    </>
-  );
-  if (error) content = <h6>{error.stack}</h6>;
-  if (loading) {
-    console.info("loading");
-    content = <Spinner />;
-  }
-
   return (
     <div className="App">
-      <header className="App-header">{content}</header>
+      <header className="App-header">
+        <Summary />
+        <CountryPicker />
+        <Chart />
+      </header>
     </div>
   );
 }

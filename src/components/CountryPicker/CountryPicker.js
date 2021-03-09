@@ -1,42 +1,60 @@
 import { connect } from "react-redux";
-import { fetchCountryData } from "../../store/action/countryAction";
+import {
+  fetchCountries,
+  fetchCountryData,
+} from "../../store/action/countryAction";
 
-import SelectSearch from "react-select-search";
+import { Select, SelectItem, SelectSkeleton } from "carbon-components-react";
+import { useEffect } from "react";
 
-const CountryPicker = ({ countries, dispatch }) => {
+const CountryPicker = ({
+  countriesState,
+  fetchCountriesOnLoad,
+  fetchCountryDataHandler,
+}) => {
+  useEffect(() => {
+    fetchCountriesOnLoad();
+  }, []);
+
   const selectCountryHandler = (e) => {
-    console.log(e.target.value);
-    dispatch(fetchCountryData(e.target.value));
+    fetchCountryDataHandler(e.target.value);
   };
 
-  const options = countries.map((el) => ({ name: el.Country, value: el.Slug }));
+  if (countriesState.countriesLoading) return <SelectSkeleton />;
 
+  const { countries } = countriesState;
   return (
     <div>
-      <h3>Select Country</h3>
-      <select onChange={selectCountryHandler}>
-        <option></option>
-        {countries.map((option) => (
-          <option key={option.Slug} value={option.Slug}>
-            {option.Country}
-          </option>
-        ))}
-      </select>
-      {/* <div>
-        <SelectSearch
-          options={countries}
-          // multiple
-          search
-          // filterOptions={fuzzySearch}
-          placeholder="Select your country"
+      <Select
+        defaultValue="placeholder-item"
+        helperText="you must select a country to display the chart"
+        id="select-1"
+        invalidText="A valid value is required"
+        labelText="Select Country"
+        onChange={selectCountryHandler}
+        light
+      >
+        <SelectItem
+          text="Select Country"
+          value="placeholder-item"
+          disabled
+          hidden
         />
-      </div> */}
+        {countries.map((opt) => (
+          <SelectItem key={opt.Slug} text={opt.Country} value={opt.Slug} />
+        ))}
+      </Select>
     </div>
   );
 };
 
 const mapStateToProps = (state) => ({
-  countries: state.countryState.countries,
+  countriesState: state.countryState.countriesState,
 });
 
-export default connect(mapStateToProps)(CountryPicker);
+const mapDispatchToProps = (dispatch) => ({
+  fetchCountriesOnLoad: () => dispatch(fetchCountries()),
+  fetchCountryDataHandler: (countryId) => dispatch(fetchCountryData(countryId)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CountryPicker);
