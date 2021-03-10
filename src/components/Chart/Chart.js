@@ -43,7 +43,12 @@ const Chart = (props) => {
       };
       return (
         <div>
-          <Line data={data} width={1000} height={600} />
+          <h1>{country.countryId}</h1>
+          <Line
+            data={data}
+            width={(window.innerWidth * 80) / 100}
+            height={(window.innerHeight * 60) / 100}
+          />
         </div>
       );
     }
